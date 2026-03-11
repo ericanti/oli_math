@@ -90,7 +90,7 @@
 
     .controls {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 12px;
       margin: 18px 0 8px;
     }
@@ -114,13 +114,6 @@
     input:focus, select:focus, button:focus {
       outline: 3px solid rgba(99, 102, 241, 0.18);
       border-color: var(--accent);
-    }
-
-    .buttons {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      margin-top: 12px;
     }
 
     button {
@@ -196,6 +189,18 @@
       display: none;
     }
 
+    .bottom-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .bottom-actions button {
+      width: 100%;
+      min-height: 56px;
+      font-size: 1rem;
+    }
+
     .feedback.show { display: block; }
     .feedback.good { background: #ecfdf3; color: #14532d; border: 1px solid #bbf7d0; }
     .feedback.bad { background: #fef2f2; color: #7f1d1d; border: 1px solid #fecaca; }
@@ -259,6 +264,7 @@
       .controls { grid-template-columns: 1fr; }
       .answer-row { flex-direction: column; }
       .stats { grid-template-columns: 1fr; }
+      .bottom-actions { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -292,18 +298,6 @@
               <option value="hard">Hard (up to 50)</option>
             </select>
           </div>
-          <div>
-            <label for="allowPositive">Number types</label>
-            <select id="allowPositive">
-              <option value="mixed">Mixed positive/negative</option>
-              <option value="mostlyNegative">More negatives</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="buttons">
-          <button class="secondary" id="newBtn" type="button">New Problem</button>
-          <button class="secondary" id="hintBtn" type="button">Show Hint</button>
         </div>
 
         <div class="problem-box">
@@ -312,8 +306,13 @@
         </div>
 
         <div class="answer-row">
-          <input id="answerInput" type="number" inputmode="numeric" placeholder="Type your answer" />
+          <input id="answerInput" type="text" inputmode="text" placeholder="Type your answer" />
           <button class="primary" id="checkBtn" type="button">Check Answer</button>
+
+          <div class="bottom-actions">
+            <button class="secondary" id="hintBtn" type="button">Show Hint</button>
+            <button class="secondary" id="skipBtn" type="button">Skip Question</button>
+          </div>
         </div>
 
         <div id="feedback" class="feedback"></div>
@@ -375,18 +374,19 @@
   <script>
     const modeEl = document.getElementById('mode');
     const levelEl = document.getElementById('level');
-    const allowPositiveEl = document.getElementById('allowPositive');
     const problemText = document.getElementById('problemText');
     const answerInput = document.getElementById('answerInput');
     const feedback = document.getElementById('feedback');
     const correctCount = document.getElementById('correctCount');
     const wrongCount = document.getElementById('wrongCount');
     const streakCount = document.getElementById('streakCount');
+    const checkBtn = document.getElementById('checkBtn');
 
     let currentProblem = null;
     let correct = 0;
     let wrong = 0;
     let streak = 0;
+    let awaitingNextQuestion = false;
 
     function randomInt(min, max) {
       return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -402,10 +402,7 @@
     function randomSignedNumber() {
       const limit = getLimit();
       let n = randomInt(1, limit);
-      const type = allowPositiveEl.value;
-      const makeNegative = type === 'mostlyNegative'
-        ? Math.random() < 0.72
-        : Math.random() < 0.5;
+      const makeNegative = Math.random() < 0.5;
       return makeNegative ? -n : n;
     }
 
@@ -453,6 +450,22 @@
       return 'Hint: for multiplication, same signs = positive, different signs = negative.';
     }
 
+    function showFeedback(type, html) {
+      feedback.className = `feedback show ${type}`;
+      feedback.innerHTML = html;
+    }
+
+    function updateStats() {
+      correctCount.textContent = correct;
+      wrongCount.textContent = wrong;
+      streakCount.textContent = streak;
+    }
+
+    function resetCheckButton() {
+      awaitingNextQuestion = false;
+      checkBtn.textContent = 'Check Answer';
+    }
+
     function generateProblem() {
       let a = randomSignedNumber();
       let b = randomSignedNumber();
@@ -470,25 +483,27 @@
       answerInput.value = '';
       feedback.className = 'feedback';
       feedback.innerHTML = '';
+      resetCheckButton();
       answerInput.focus();
-    }
-
-    function showFeedback(type, html) {
-      feedback.className = `feedback show ${type}`;
-      feedback.innerHTML = html;
-    }
-
-    function updateStats() {
-      correctCount.textContent = correct;
-      wrongCount.textContent = wrong;
-      streakCount.textContent = streak;
     }
 
     function checkAnswer() {
       if (!currentProblem) return;
+
+      if (awaitingNextQuestion) {
+        generateProblem();
+        return;
+      }
+
       const userValue = answerInput.value.trim();
+
       if (userValue === '') {
         showFeedback('bad', 'Enter an answer first.');
+        return;
+      }
+
+      if (!/^[-]?\d+$/.test(userValue)) {
+        showFeedback('bad', 'Please enter a whole number like -4 or 7.');
         return;
       }
 
@@ -503,6 +518,8 @@
         streak += 1;
         updateStats();
         showFeedback('good', `<strong>Correct.</strong> ${explanation}`);
+        awaitingNextQuestion = true;
+        checkBtn.textContent = 'Next Question';
       } else {
         wrong += 1;
         streak = 0;
@@ -511,12 +528,17 @@
       }
     }
 
-    document.getElementById('newBtn').addEventListener('click', generateProblem);
-    document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+    checkBtn.addEventListener('click', checkAnswer);
+
     document.getElementById('hintBtn').addEventListener('click', () => {
       if (!currentProblem) return;
       const { a, b, op } = currentProblem;
       showFeedback('good', hintText(a, b, op));
+    });
+
+    document.getElementById('skipBtn').addEventListener('click', () => {
+      generateProblem();
+      showFeedback('good', 'Question skipped. Here is a new one.');
     });
 
     answerInput.addEventListener('keydown', (e) => {
@@ -525,7 +547,6 @@
 
     modeEl.addEventListener('change', generateProblem);
     levelEl.addEventListener('change', generateProblem);
-    allowPositiveEl.addEventListener('change', generateProblem);
 
     generateProblem();
     updateStats();
