@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Negative Number Practice</title>
+  <style>
+    :root {
+      --bg1: #f8fbff;
+      --bg2: #eef2ff;
+      --card: rgba(255,255,255,0.88);
+      --text: #1f2937;
+      --muted: #6b7280;
+      --accent: #6366f1;
+      --accent-2: #8b5cf6;
+      --good: #15803d;
+      --bad: #b91c1c;
+      --shadow: 0 18px 45px rgba(99, 102, 241, 0.16);
+      --radius: 24px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #dbeafe 0%, transparent 35%),
+        radial-gradient(circle at bottom right, #ede9fe 0%, transparent 30%),
+        linear-gradient(135deg, var(--bg1), var(--bg2));
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 32px 18px 60px;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(99,102,241,0.95), rgba(139,92,246,0.95));
+      color: white;
+      border-radius: 32px;
+      padding: 34px 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      margin: 0 0 10px;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      line-height: 1.05;
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      opacity: 0.95;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.95fr;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.55);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+    }
+
+    .section-title {
+      margin: 0 0 8px;
+      font-size: 1.3rem;
+    }
+
+    .subtle {
+      color: var(--muted);
+      line-height: 1.55;
+      margin-top: 0;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0 8px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.92rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    select, button, input {
+      width: 100%;
+      border-radius: 14px;
+      border: 1px solid #d1d5db;
+      padding: 12px 14px;
+      font-size: 1rem;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, button:focus {
+      outline: 3px solid rgba(99, 102, 241, 0.18);
+      border-color: var(--accent);
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      font-weight: 700;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white;
+    }
+
+    .secondary {
+      background: white;
+      color: var(--text);
+      border: 1px solid #d1d5db;
+    }
+
+    .problem-box {
+      margin: 24px 0 16px;
+      padding: 24px;
+      text-align: center;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(243,244,255,0.95));
+      border: 1px solid rgba(99,102,241,0.12);
+    }
+
+    .problem-label {
+      font-size: 0.95rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .problem {
+      font-size: clamp(2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      margin: 0;
+    }
+
+    .answer-row {
+      display: flex;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .answer-row input {
+      flex: 1;
+      font-size: 1.1rem;
+    }
+
+    .feedback {
+      border-radius: 18px;
+      padding: 16px;
+      line-height: 1.6;
+      margin-top: 14px;
+      display: none;
+    }
+
+    .feedback.show { display: block; }
+    .feedback.good { background: #ecfdf3; color: #14532d; border: 1px solid #bbf7d0; }
+    .feedback.bad { background: #fef2f2; color: #7f1d1d; border: 1px solid #fecaca; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .stat {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 14px;
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+    }
+
+    .rule-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .rule {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .rule strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+    }
+
+    .mini {
+      color: var(--muted);
+      font-size: 0.95rem;
+      line-height: 1.55;
+      margin: 0;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 860px) {
+      .grid { grid-template-columns: 1fr; }
+      .controls { grid-template-columns: 1fr; }
+      .answer-row { flex-direction: column; }
+      .stats { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>Negative Number Practice</h1>
+      <p>
+        Practice adding and multiplying positive and negative numbers. If an answer is wrong,
+        the page explains what happened and gives a simple memory trick for the signs.
+      </p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2 class="section-title">Practice Area</h2>
+        <p class="subtle">Choose what to practice, solve the problem, and read the explanation after each answer.</p>
+
+        <div class="controls">
+          <div>
+            <label for="mode">Operation</label>
+            <select id="mode">
+              <option value="mixed">Mixed</option>
+              <option value="addition">Addition only</option>
+              <option value="multiplication">Multiplication only</option>
+            </select>
+          </div>
+          <div>
+            <label for="level">Difficulty</label>
+            <select id="level">
+              <option value="easy">Easy (up to 10)</option>
+              <option value="medium" selected>Medium (up to 20)</option>
+              <option value="hard">Hard (up to 50)</option>
+            </select>
+          </div>
+          <div>
+            <label for="allowPositive">Number types</label>
+            <select id="allowPositive">
+              <option value="mixed">Mixed positive/negative</option>
+              <option value="mostlyNegative">More negatives</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="secondary" id="newBtn" type="button">New Problem</button>
+          <button class="secondary" id="hintBtn" type="button">Show Hint</button>
+        </div>
+
+        <div class="problem-box">
+          <div class="problem-label">Current Problem</div>
+          <p class="problem" id="problemText">-3 + 7</p>
+        </div>
+
+        <div class="answer-row">
+          <input id="answerInput" type="number" inputmode="numeric" placeholder="Type your answer" />
+          <button class="primary" id="checkBtn" type="button">Check Answer</button>
+        </div>
+
+        <div id="feedback" class="feedback"></div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="stat-number" id="correctCount">0</div>
+            <div>Correct</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number" id="wrongCount">0</div>
+            <div>Missed</div>
+          </div>
+          <div class="stat">
+            <div class="stat-number" id="streakCount">0</div>
+            <div>Streak</div>
+          </div>
+        </div>
+      </section>
+
+      <aside class="card">
+        <h2 class="section-title">Sign Rules</h2>
+        <p class="subtle">These are the main patterns to remember.</p>
+
+        <div class="rule-list">
+          <div class="rule">
+            <strong>Positive × Positive = Positive</strong>
+            <p class="mini">Same sign for multiplication? Positive result when both are positive.</p>
+          </div>
+          <div class="rule">
+            <strong>Negative × Negative = Positive</strong>
+            <p class="mini">Two negatives multiply to a positive. Memory trick: “two flips make it face forward again.”</p>
+          </div>
+          <div class="rule">
+            <strong>Negative × Positive = Negative</strong>
+            <p class="mini">Different signs in multiplication give a negative answer.</p>
+          </div>
+          <div class="rule">
+            <strong>Adding same signs</strong>
+            <p class="mini">Add the amounts and keep the sign. Example: -4 + -3 = -7.</p>
+          </div>
+          <div class="rule">
+            <strong>Adding different signs</strong>
+            <p class="mini">Subtract the smaller absolute value from the larger one, then keep the sign of the larger number.</p>
+          </div>
+          <div class="rule">
+            <strong>Helpful idea</strong>
+            <p class="mini">Treat a negative as owing money. Owing more makes you more negative. Paying off debt moves you toward positive.</p>
+          </div>
+        </div>
+
+        <p class="footer-note">
+          Tip: for addition, look at whether the numbers are working together or canceling each other out. For multiplication, only focus on whether the signs match.
+        </p>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const modeEl = document.getElementById('mode');
+    const levelEl = document.getElementById('level');
+    const allowPositiveEl = document.getElementById('allowPositive');
+    const problemText = document.getElementById('problemText');
+    const answerInput = document.getElementById('answerInput');
+    const feedback = document.getElementById('feedback');
+    const correctCount = document.getElementById('correctCount');
+    const wrongCount = document.getElementById('wrongCount');
+    const streakCount = document.getElementById('streakCount');
+
+    let currentProblem = null;
+    let correct = 0;
+    let wrong = 0;
+    let streak = 0;
+
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function getLimit() {
+      const level = levelEl.value;
+      if (level === 'easy') return 10;
+      if (level === 'hard') return 50;
+      return 20;
+    }
+
+    function randomSignedNumber() {
+      const limit = getLimit();
+      let n = randomInt(1, limit);
+      const type = allowPositiveEl.value;
+      const makeNegative = type === 'mostlyNegative'
+        ? Math.random() < 0.72
+        : Math.random() < 0.5;
+      return makeNegative ? -n : n;
+    }
+
+    function chooseOperation() {
+      if (modeEl.value === 'addition') return '+';
+      if (modeEl.value === 'multiplication') return '×';
+      return Math.random() < 0.5 ? '+' : '×';
+    }
+
+    function formatNumber(n) {
+      return n < 0 ? `(${n})` : `${n}`;
+    }
+
+    function getSignWord(n) {
+      return n < 0 ? 'negative' : 'positive';
+    }
+
+    function additionExplanation(a, b, answer) {
+      const absA = Math.abs(a);
+      const absB = Math.abs(b);
+
+      if ((a < 0 && b < 0) || (a > 0 && b > 0)) {
+        return `Both numbers have the same sign, so add the sizes and keep that sign. ${a} and ${b} are both ${getSignWord(a)}, so ${absA} + ${absB} = ${Math.abs(answer)}, and the answer keeps the ${getSignWord(a)} sign: <strong>${answer}</strong>.`;
+      }
+
+      const larger = absA >= absB ? a : b;
+      return `These numbers have different signs, so subtract the smaller size from the larger size. Here that is ${Math.max(absA, absB)} - ${Math.min(absA, absB)} = ${Math.abs(answer)}. Then keep the sign of the number with the larger size, which is ${larger}. That makes the answer <strong>${answer}</strong>.`;
+    }
+
+    function multiplicationExplanation(a, b, answer) {
+      const sameSign = (a < 0 && b < 0) || (a > 0 && b > 0);
+      const signPart = sameSign
+        ? 'The signs match, so the product is positive.'
+        : 'The signs are different, so the product is negative.';
+      return `${signPart} Then multiply the sizes: ${Math.abs(a)} × ${Math.abs(b)} = ${Math.abs(answer)}. Final answer: <strong>${answer}</strong>. Memory trick: same signs give positive, different signs give negative.`;
+    }
+
+    function hintText(a, b, op) {
+      if (op === '+') {
+        if ((a < 0 && b < 0) || (a > 0 && b > 0)) {
+          return 'Hint: same signs for addition means add the amounts and keep the sign.';
+        }
+        return 'Hint: different signs for addition means subtract the smaller amount from the larger one, then keep the sign of the larger amount.';
+      }
+      return 'Hint: for multiplication, same signs = positive, different signs = negative.';
+    }
+
+    function generateProblem() {
+      let a = randomSignedNumber();
+      let b = randomSignedNumber();
+      const op = chooseOperation();
+
+      if (op === '+' && Math.random() < 0.25) {
+        const limit = getLimit();
+        a = randomInt(1, limit) * (Math.random() < 0.5 ? -1 : 1);
+        b = -a;
+      }
+
+      const answer = op === '+' ? a + b : a * b;
+      currentProblem = { a, b, op, answer };
+      problemText.textContent = `${formatNumber(a)} ${op} ${formatNumber(b)}`;
+      answerInput.value = '';
+      feedback.className = 'feedback';
+      feedback.innerHTML = '';
+      answerInput.focus();
+    }
+
+    function showFeedback(type, html) {
+      feedback.className = `feedback show ${type}`;
+      feedback.innerHTML = html;
+    }
+
+    function updateStats() {
+      correctCount.textContent = correct;
+      wrongCount.textContent = wrong;
+      streakCount.textContent = streak;
+    }
+
+    function checkAnswer() {
+      if (!currentProblem) return;
+      const userValue = answerInput.value.trim();
+      if (userValue === '') {
+        showFeedback('bad', 'Enter an answer first.');
+        return;
+      }
+
+      const userAnswer = Number(userValue);
+      const { a, b, op, answer } = currentProblem;
+      const explanation = op === '+'
+        ? additionExplanation(a, b, answer)
+        : multiplicationExplanation(a, b, answer);
+
+      if (userAnswer === answer) {
+        correct += 1;
+        streak += 1;
+        updateStats();
+        showFeedback('good', `<strong>Correct.</strong> ${explanation}`);
+      } else {
+        wrong += 1;
+        streak = 0;
+        updateStats();
+        showFeedback('bad', `<strong>Not quite.</strong> You entered <strong>${userAnswer}</strong>, but the correct answer is <strong>${answer}</strong>. ${explanation}`);
+      }
+    }
+
+    document.getElementById('newBtn').addEventListener('click', generateProblem);
+    document.getElementById('checkBtn').addEventListener('click', checkAnswer);
+    document.getElementById('hintBtn').addEventListener('click', () => {
+      if (!currentProblem) return;
+      const { a, b, op } = currentProblem;
+      showFeedback('good', hintText(a, b, op));
+    });
+
+    answerInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') checkAnswer();
+    });
+
+    modeEl.addEventListener('change', generateProblem);
+    levelEl.addEventListener('change', generateProblem);
+    allowPositiveEl.addEventListener('change', generateProblem);
+
+    generateProblem();
+    updateStats();
+  </script>
+</body>
+</html>
