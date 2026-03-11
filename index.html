@@ -170,12 +170,21 @@
 
     .answer-row {
       display: flex;
+      flex-direction: column;
       gap: 12px;
       margin: 16px 0;
     }
 
     .answer-row input {
-      flex: 1;
+      width: 100%;
+      min-height: 64px;
+      font-size: 1.35rem;
+      padding: 16px 18px;
+    }
+
+    .answer-row button {
+      width: 100%;
+      min-height: 58px;
       font-size: 1.1rem;
     }
 
@@ -258,15 +267,13 @@
     <section class="hero">
       <h1>Negative Number Practice</h1>
       <p>
-        Practice adding and multiplying positive and negative numbers. If an answer is wrong,
-        the page explains what happened and gives a simple memory trick for the signs.
+        Practice adding and multiplying positive and negative numbers. You got this!
       </p>
     </section>
 
     <div class="grid">
       <section class="card">
         <h2 class="section-title">Practice Area</h2>
-        <p class="subtle">Choose what to practice, solve the problem, and read the explanation after each answer.</p>
 
         <div class="controls">
           <div>
